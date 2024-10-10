@@ -3,9 +3,14 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "nodemon index.js"
-  },
+    "start": "node index.js",
+    "dev": "nodemon index.js",
+    "build:ui": "rm -rf build && cd ../frontend/ && npm run build && cp -r build ../backend",
+    "deploy": "fly deploy",
+    "deploy:full": "npm run build:ui && npm run deploy",
+    "logs:prod": "fly logs",
+    "lint": "eslint .",
+    "test": "node --test"  },
   "author": "",
   "license": "ISC",
   "description": "",
