@@ -90,7 +90,7 @@ describe('total likes', () => {
   })
 
 
-  describe('most likes', () => {
+  describe('most likes for a blog', () => {
     const answer = {
       _id: "5a422b3a1b54a676234d17f9",
       title: "Canonical string reduction",
@@ -99,9 +99,29 @@ describe('total likes', () => {
       likes: 12,
       __v: 0
     }
-  
     test('Blog with the most likes', () => {
       const result = listHelper.favoriteBlog(listWithMultipleBlogs)
-      assert.deepStrictEqual(result, answer)})
+      assert.deepStrictEqual(result, answer)
+    })
+  })
+  describe('most blogs', () => {
+    const answer = {
+      author: "Robert C. Martin",
+      blogs: 3
+    }
+    test('Most blogs by author', () => {
+      const result = listHelper.mostBlogs(listWithMultipleBlogs)
+      assert.deepStrictEqual(result, answer)
+    })
+  })
+  describe('most likes', () => {
+    const answer = {
+      author: "Edsger W. Dijkstra",
+      likes: 17
+    }
+    test('Most likes by author', () => {
+      const result = listHelper.mostLikes(listWithMultipleBlogs)
+      assert.deepStrictEqual(result, answer)
+    })
   })
 })
