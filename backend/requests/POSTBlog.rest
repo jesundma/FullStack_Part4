@@ -2,8 +2,8 @@ POST http://localhost:3003/api/blogs
 Content-Type: application/json
 
 {
-  "title": "paskaa",
-  "author": "homo",
-  "url": "https://vitut",
+  "title": "vitutututututut",
+  "author": "vittupää",
+  "url": "https://vittuatarjolla.com",
   "likes": 0
 }
