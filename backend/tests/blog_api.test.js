@@ -27,7 +27,21 @@ test('there are two notes', async () => {
   const response = await api.get('/api/blogs')  
     assert.strictEqual(response.body.length, 6)
   })
-  
+
+test('blog identifiers are in id field, not _id', async () => {
+  const response = await api
+    .get('/api/blogs')
+    .expect(200)
+    .expect('Content-Type', /application\/json/);
+
+  const blogsDB = response.body
+
+  blogsDB.forEach(blog => {
+    assert.ok(blog.id)
+    assert.strictEqual(blog._id, undefined)
+    })
+  })
+
   after(async () => {
     await mongoose.connection.close()
   })
