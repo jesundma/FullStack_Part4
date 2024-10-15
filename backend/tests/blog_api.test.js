@@ -67,18 +67,25 @@ test('add new blog functions and confirm that original and response values are s
     url: newBlog.url,
     likes: newBlog.likes
   })
+})
+
 test('field likes has default value of 0 if no value provided', async () => {
   const newBlog = {
     "title": "Spice Must Flow",
     "author": "Spacing Guild",
     "url": "http://melange.com",
-    "likes": 
+    "likes": null
   }
 
-  
-  })
-})
+  const postedBlog = await api
+    .post('/api/blogs/')
+    .send(newBlog)
+    .expect(200)
+    .expect('Content-Type', /application\/json/)
 
+  assert.strictEqual(postedBlog.body.likes, 0)
+
+})
 
   after(async () => {
     await mongoose.connection.close()
