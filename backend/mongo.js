@@ -5,7 +5,7 @@ if (process.argv.length<3) {
   process.exit(1)
 }
 
-const password = process.argv[3]
+const password = process.argv[2]
 console.log(password)
 
 const url = `mongodb+srv://JSundman:${password}@cluster0.2ymmr5x.mongodb.net/testBlogList?retryWrites=true&w=majority&appName=Cluster0`
@@ -34,7 +34,7 @@ if (process.argv.length === 4) {
     title: process.argv[4],
     author: process.argv[5],
     url: process.argv[6],
-    likes: process.argv[7]
+    likes: process.argv[7] ?? 0
   })
 
   blog.save().then(() => {
