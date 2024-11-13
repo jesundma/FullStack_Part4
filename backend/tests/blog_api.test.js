@@ -5,6 +5,7 @@ const helper = require('./test_helper')
 const supertest = require('supertest')
 const app = require('../app')
 const Blog = require('../models/blog')
+const { isNull } = require('lodash')
 
 const api = supertest(app)
 
@@ -85,6 +86,23 @@ test('field likes has default value of 0 if no value provided', async () => {
 
   assert.strictEqual(postedBlog.body.likes, 0)
 
+})
+
+test('request without fields title and url response is 400 Bad Request', async () => {
+  const newBlog = {
+    "title": null,
+    "author": "Spacing Guild",
+    "url": null,
+    "likes": 0
+  }
+
+  const postedBlog = await api
+    .post('/api/blogs/')
+    .send(newBlog)
+    .expect(400)
+    .expect('Content-Type', /application\/json/)
+
+  assert.strictEqual(postedBlog.body.error, 'Title and URL required')
 })
 
   after(async () => {

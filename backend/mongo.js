@@ -34,7 +34,7 @@ if (process.argv.length === 4) {
     title: process.argv[4],
     author: process.argv[5],
     url: process.argv[6],
-    likes: process.argv[7] ?? 0
+    likes: process.argv[7] ?? 0 // delete later, only for command line additions
   })
 
   blog.save().then(() => {
