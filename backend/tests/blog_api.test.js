@@ -18,7 +18,7 @@ beforeEach(async () => {
 })
 
 test('notes are returned as json', async () => {
-  const response = await api
+  const response = await api //Router mounted with full path /api/blogs/
     .get('/api/blogs')
     .expect(200)
     .expect('Content-Type', /application\/json/)
@@ -103,6 +103,42 @@ test('request without fields title and url response is 400 Bad Request', async (
     .expect('Content-Type', /application\/json/)
 
   assert.strictEqual(postedBlog.body.error, 'Title and URL required')
+})
+
+test('Deleting blog functions', async () => {
+  const newBlog = {
+    "title": "Four legs good, two legs bad",
+    "author": "Spacing Napoleon",
+    "url": "www.orwellwasright.com",
+    "likes": 42
+  }
+
+  const postedBlog = await api
+    .post('/api/blogs/')
+    .send(newBlog)
+    .expect(200)
+    .expect('Content-Type', /application\/json/)
+
+    // Blog posted, id in response
+
+  const blogId = postedBlog.body.id
+  
+  const deletedBlog = await api
+    .delete(`/api/blogs/${blogId}`)
+    .expect(204)
+
+    // Blog deletion response 204 No Content
+
+  assert.strictEqual(deletedBlog.status, 204, 'Status code 204 for delete')
+
+  const deletedBlogResponse =  await api
+  .get(`/api/blogs/${blogId}`)
+  .expect(404)
+  
+  // Blog get by id should return 404
+
+  assert.strictEqual(deletedBlogResponse.status, 404, 'Status code 404 after deletion')
+
 })
 
   after(async () => {
