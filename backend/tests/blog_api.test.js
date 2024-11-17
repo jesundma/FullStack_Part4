@@ -106,40 +106,70 @@ describe('tests for field content and default', () => {
   })
 })
 
-test('Deleting blog functions', async () => {
-  const newBlog = {
-    "title": "Four legs good, two legs bad",
-    "author": "Spacing Napoleon",
-    "url": "www.orwellwasright.com",
-    "likes": 42
-  }
+describe('Functions changing blog content', () => {
+  test('should delete blog and return 204 No Content', async () => {
+    const newBlog = {
+      "title": "Four legs good, two legs bad",
+      "author": "Spacing Napoleon",
+      "url": "www.orwellwasright.com",
+      "likes": 42
+    }
 
-  const postedBlog = await api
-    .post('/api/blogs/')
-    .send(newBlog)
-    .expect(200)
-    .expect('Content-Type', /application\/json/)
+    const postedBlog = await api
+      .post('/api/blogs/')
+      .send(newBlog)
+      .expect(200)
+      .expect('Content-Type', /application\/json/)
 
     // Blog posted, id in response
+    const blogId = postedBlog.body.id
+    
+    const deletedBlog = await api
+      .delete(`/api/blogs/${blogId}`)
+      .expect(204)
 
-  const blogId = postedBlog.body.id
-  
-  const deletedBlog = await api
-    .delete(`/api/blogs/${blogId}`)
-    .expect(204)
+    // Assert that status code is 204 for successful delete
+    assert.strictEqual(deletedBlog.status, 204, 'Status code 204 for delete')
 
-    // Blog deletion response 204 No Content
+    const deletedBlogResponse = await api
+      .get(`/api/blogs/${blogId}`)
+      .expect(404)
 
-  assert.strictEqual(deletedBlog.status, 204, 'Status code 204 for delete')
+    // Assert that status code is 404 after deletion
+    assert.strictEqual(deletedBlogResponse.status, 404, 'Status code 404 after deletion')
+  })
 
-  const deletedBlogResponse =  await api
-  .get(`/api/blogs/${blogId}`)
-  .expect(404)
-  
-  // Blog get by id should return 404
+  test('Change of field Likes functions', async () => {
+    const newBlog = {
+      "title": "Four legs good, two legs bad",
+      "author": "Spacing Napoleon",
+      "url": "www.orwellwasright.com",
+      "likes": 42
+    }
 
-  assert.strictEqual(deletedBlogResponse.status, 404, 'Status code 404 after deletion')
+    const postedBlog = await api
+      .post('/api/blogs/')
+      .send(newBlog)
+      .expect(200)
+      .expect('Content-Type', /application\/json/)
 
+    const blogId = postedBlog.body.id
+
+    const changeBlog = {
+      "title": "Four legs good, two legs bad",
+      "author": "Spacing Napoleon",
+      "url": "www.orwellwasright.com",
+      "likes": 52
+    }
+
+    const changedBlog = await api
+      .put(`/api/blogs/${blogId}`)  // Corrected string interpolation with backticks
+      .send(changeBlog)
+      .expect(200)
+      .expect('Content-Type', /application\/json/)
+
+    assert.strictEqual(changedBlog.body.likes, 52, 'Blog likes is 52 after put')
+  })
 })
 
   after(async () => {
