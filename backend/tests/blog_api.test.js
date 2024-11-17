@@ -1,4 +1,4 @@
-const { test, after, beforeEach } = require('node:test')
+const { test, after, beforeEach, describe } = require('node:test')
 const mongoose = require('mongoose')
 const assert = require('node:assert')
 const helper = require('./test_helper')
@@ -70,39 +70,40 @@ test('add new blog functions and confirm that original and response values are s
   })
 })
 
-test('field likes has default value of 0 if no value provided', async () => {
-  const newBlog = {
-    "title": "Spice Must Flow",
-    "author": "Spacing Guild",
-    "url": "http://melange.com",
-    "likes": null
-  }
+describe('tests for field content and default', () => { 
+  test('field likes has default value of 0 if no value provided', async () => {
+    const newBlog = {
+      "title": "Spice Must Flow",
+      "author": "Spacing Guild",
+      "url": "http://melange.com",
+      "likes": null
+    }
 
-  const postedBlog = await api
-    .post('/api/blogs/')
-    .send(newBlog)
-    .expect(200)
-    .expect('Content-Type', /application\/json/)
+    const postedBlog = await api
+      .post('/api/blogs/')
+      .send(newBlog)
+      .expect(200)
+      .expect('Content-Type', /application\/json/)
 
-  assert.strictEqual(postedBlog.body.likes, 0)
+    assert.strictEqual(postedBlog.body.likes, 0)
+  })
 
-})
+  test('request without fields title and url response is 400 Bad Request', async () => {
+    const newBlog = {
+      "title": null,
+      "author": "Spacing Guild",
+      "url": null,
+      "likes": 0
+    }
 
-test('request without fields title and url response is 400 Bad Request', async () => {
-  const newBlog = {
-    "title": null,
-    "author": "Spacing Guild",
-    "url": null,
-    "likes": 0
-  }
+    const postedBlog = await api
+      .post('/api/blogs/')
+      .send(newBlog)
+      .expect(400)
+      .expect('Content-Type', /application\/json/)
 
-  const postedBlog = await api
-    .post('/api/blogs/')
-    .send(newBlog)
-    .expect(400)
-    .expect('Content-Type', /application\/json/)
-
-  assert.strictEqual(postedBlog.body.error, 'Title and URL required')
+    assert.strictEqual(postedBlog.body.error, 'Title and URL required')
+  })
 })
 
 test('Deleting blog functions', async () => {
