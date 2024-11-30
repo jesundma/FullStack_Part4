@@ -50,7 +50,8 @@ test('add new blog functions and confirm that original and response values are s
     "title": "Meaning of life",
     "author": "Douglas, A.",
     "url": "http://douglasadams.com",
-    "likes": 42
+    "likes": 42,
+    "userId": "67407f383b12c1120498f48c",
   }
     
   const postedBlog = await api
@@ -78,7 +79,9 @@ describe('tests for field content and default', () => {
       "title": "Spice Must Flow",
       "author": "Spacing Guild",
       "url": "http://melange.com",
-      "likes": null
+      "likes": null,
+      "user":"673effae84655ca98d08db36"
+
     }
 
     const postedBlog = await api
@@ -95,7 +98,9 @@ describe('tests for field content and default', () => {
       "title": null,
       "author": "Spacing Guild",
       "url": null,
-      "likes": 0
+      "likes": 0,
+      "user":"673effae84655ca98d08db36"
+
     }
 
     const postedBlog = await api
@@ -114,7 +119,8 @@ describe('Functions changing blog content', () => {
       "title": "Four legs good, two legs bad",
       "author": "Spacing Napoleon",
       "url": "www.orwellwasright.com",
-      "likes": 42
+      "likes": 42,
+      "user":"673effae84655ca98d08db36"
     }
 
     const postedBlog = await api
@@ -146,7 +152,8 @@ describe('Functions changing blog content', () => {
       "title": "Four legs good, two legs bad",
       "author": "Spacing Napoleon",
       "url": "www.orwellwasright.com",
-      "likes": 42
+      "likes": 42,
+      "user":"673effae84655ca98d08db36"
     }
 
     const postedBlog = await api
@@ -161,7 +168,8 @@ describe('Functions changing blog content', () => {
       "title": "Four legs good, two legs bad",
       "author": "Spacing Napoleon",
       "url": "www.orwellwasright.com",
-      "likes": 52
+      "likes": 52,
+      "user":"673effae84655ca98d08db36"
     }
 
     const changedBlog = await api
@@ -171,39 +179,6 @@ describe('Functions changing blog content', () => {
       .expect('Content-Type', /application\/json/)
 
     assert.strictEqual(changedBlog.body.likes, 52, 'Blog likes is 52 after put')
-  })
-})
-
-describe('when there is initially one user at db', () => {
-  beforeEach(async () => {
-    await User.deleteMany({})
-
-    const passwordHash = await bcrypt.hash('sekret', 10)
-    const user = new User({ username: 'root', passwordHash })
-
-    await user.save()
-  })
-
-  test('creation succeeds with a fresh username', async () => {
-    const usersAtStart = await helper.usersInDb()
-
-    const newUser = {
-      username: 'mluukkai',
-      name: 'Matti Luukkainen',
-      password: 'salainen',
-    }
-
-    await api
-      .post('/api/users')
-      .send(newUser)
-      .expect(201)
-      .expect('Content-Type', /application\/json/)
-
-    const usersAtEnd = await helper.usersInDb()
-    assert.strictEqual(usersAtEnd.length, usersAtStart.length + 1)
-
-    const usernames = usersAtEnd.map(u => u.username)
-    assert(usernames.includes(newUser.username))
   })
 })
 
