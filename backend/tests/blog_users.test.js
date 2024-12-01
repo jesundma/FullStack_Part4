@@ -44,6 +44,30 @@ describe('when there is initially one user at db', () => {
   })
 })
 
+describe('tests for proper username and password', () => {
+  test('empty username provides error', async () => {
+  
+    const usersAtStart = await helper.usersInDb()
+  
+    const newUser = {
+      username: null,
+      name: 'Matti Luukkainen',
+      password: 'salainen',
+    }
+
+    await api
+      .post('/api/users')
+      .send(newUser)
+      .expect(400)
+      .expect('Content-Type', /application\/json/)
+
+      assert.strictEqual(result.body.error, 'Username is required and must be at least 3 characters long')
+      const usersAtEnd = await helper.usersInDb()
+
+      assert.strictEqual(usersAtEnd.length, usersAtStart.length)
+    })
+})
+
   after(async () => {
     await mongoose.connection.close()
   })

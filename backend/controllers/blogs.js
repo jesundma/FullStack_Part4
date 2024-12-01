@@ -28,7 +28,7 @@ blogsRouter.post('/', async (request, response) => {
   if (!body.title || !body.url) {
     return response.status(400).json({
       error: 'Title and URL required'
-    });
+    })
   }
 
   const user = await User.findById(body.userId)
