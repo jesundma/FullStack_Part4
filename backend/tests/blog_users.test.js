@@ -115,6 +115,48 @@ describe('tests for proper username and password', () => {
   })
 })
 
+describe('tests for showing user who added blog and list of blogs added by user ', () => {
+  test('a new blog is correctly associated with an existing user', async () => {
+    
+    const newUser = {
+      username: 'skubrick',
+      name: 'Stanley Kubrick',
+      password: 'moloko',
+    }
+
+    const result = await api
+    .post('/api/users')
+    .send(newUser)
+    .expect(201)
+    .expect('Content-Type', /application\/json/)
+
+    const id = result.body._id
+
+    const newBlog = { 
+      title: "Dim, Georgie, and Pete",
+      author: "Alex",
+      url: "http://clockworkorange.com",
+      likes: 42,
+      user: id,
+    }
+  
+    const blogResponse = await api
+      .post('/api/blogs')
+      .send(newBlog)
+      .expect(201)
+      .expect('Content-Type', /application\/json/)
+  
+    const savedBlog = blogResponse.body
+    assert.strictEqual(savedBlog.user.username, newUser.username, "Blog's username does not match the user")
+    assert.strictEqual(savedBlog.user.name, newUser.name, "Blog's user name does not match the user")
+    assert.strictEqual(savedBlog.user.id, newUser.id, "Blog's user ID does not match the user")
+  
+    const updatedUserResponse = await api.get(`/api/users/${newUser.id}`)
+    const updatedUser = updatedUserResponse.body
+    assert.strictEqual(updatedUser.blogs.length, newUser.blogs.length + 1, "User's blog count does not match")
+  })  
+})
+
 after(async () => {
   await mongoose.connection.close()
 })
