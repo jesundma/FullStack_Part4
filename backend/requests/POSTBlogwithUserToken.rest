@@ -1,0 +1,10 @@
+POST http://localhost:3003/api/blogs HTTP/1.1
+Content-Type: application/json
+Authorization: Bearer yJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImpvaG5fZG9lIiwiaWQiOiI2NzRhY2Q3ZTU3NTliNWJiZjNjYWRiNjciLCJpYXQiOjE3MzMzNDAwOTUsImV4cCI6MTczMzM0MzY5NX0.53mqN-7Wd8KyCY7kfogyD0bi3bWV4tLifOVauDGdBmE
+
+{
+  "title": "Tokenization of Life, part 2",
+  "author": "Douglas, A.",
+  "url": "http://multitoken.com",
+  "likes": 42
+}
