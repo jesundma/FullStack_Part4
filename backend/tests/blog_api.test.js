@@ -11,22 +11,44 @@ const { isNull } = require('lodash')
 
 const api = supertest(app)
 
+let permaToken = ''
+let permaUserId = ''
+
 beforeEach(async () => {
-  await Blog.deleteMany({})
-  const blogObjects = helper.initialBlogs
-    .map(blog => new Blog(blog))
+  await User.deleteMany({})
+
+  const user = new User({
+    username: 'SuperUser',
+    name: 'Super User',
+    passwordHash: await bcrypt.hash('SuperPassword', 10),
+  })
+
+  const savedUser = await user.save()
+  permaUserId = savedUser._id.toString()
+
+  const response = await api
+    .post('/api/login')
+    .send({
+      username: 'SuperUser',
+      password: 'SuperPassword',
+    })
+
+  permaToken = response.body.token
+
+  await Blog.deleteMany({});
+  const blogObjects = helper.initialBlogs.map(blog => new Blog(blog))
   const promiseArray = blogObjects.map(blog => blog.save())
   await Promise.all(promiseArray)
 })
 
 test('notes are returned as json', async () => {
-  const response = await api //Router mounted with full path /api/blogs/
+  const response = await api
     .get('/api/blogs')
     .expect(200)
     .expect('Content-Type', /application\/json/)
   })
 
-test('there are two notes', async () => {
+test('there are six notes initiliazed to database', async () => {
   const response = await api.get('/api/blogs')  
     assert.strictEqual(response.body.length, 6)
   })
@@ -50,12 +72,12 @@ test('add new blog functions and confirm that original and response values are s
     "title": "Meaning of life",
     "author": "Douglas, A.",
     "url": "http://douglasadams.com",
-    "likes": 42,
-    "userId": "67407f383b12c1120498f48c",
+    "likes": 42
   }
     
   const postedBlog = await api
     .post('/api/blogs/')
+    .set('Authorization', `Bearer ${permaToken}`)
     .send(newBlog)
     .expect(200)
     .expect('Content-Type', /application\/json/)
@@ -69,7 +91,8 @@ test('add new blog functions and confirm that original and response values are s
     title: newBlog.title,
     author: newBlog.author,
     url: newBlog.url,
-    likes: newBlog.likes
+    likes: newBlog.likes,
+    user: permaUserId,
   })
 })
 
@@ -80,12 +103,12 @@ describe('tests for field content and default', () => {
       "author": "Spacing Guild",
       "url": "http://melange.com",
       "likes": null,
-      "user":"673effae84655ca98d08db36"
-
+      "user": permaUserId,
     }
 
     const postedBlog = await api
       .post('/api/blogs/')
+      .set('Authorization', `Bearer ${permaToken}`)
       .send(newBlog)
       .expect(200)
       .expect('Content-Type', /application\/json/)
@@ -99,12 +122,12 @@ describe('tests for field content and default', () => {
       "author": "Spacing Guild",
       "url": null,
       "likes": 0,
-      "user":"673effae84655ca98d08db36"
-
+      "user": permaUserId,
     }
 
     const postedBlog = await api
       .post('/api/blogs/')
+      .set('Authorization', `Bearer ${permaToken}`)
       .send(newBlog)
       .expect(400)
       .expect('Content-Type', /application\/json/)
@@ -120,11 +143,12 @@ describe('Functions changing blog content', () => {
       "author": "Spacing Napoleon",
       "url": "www.orwellwasright.com",
       "likes": 42,
-      "user":"673effae84655ca98d08db36"
+      "user": permaUserId,
     }
 
     const postedBlog = await api
       .post('/api/blogs/')
+      .set('Authorization', `Bearer ${permaToken}`)
       .send(newBlog)
       .expect(200)
       .expect('Content-Type', /application\/json/)
@@ -134,6 +158,7 @@ describe('Functions changing blog content', () => {
     
     const deletedBlog = await api
       .delete(`/api/blogs/${blogId}`)
+      .set('Authorization', `Bearer ${permaToken}`)
       .expect(204)
 
     // Assert that status code is 204 for successful delete
@@ -141,6 +166,7 @@ describe('Functions changing blog content', () => {
 
     const deletedBlogResponse = await api
       .get(`/api/blogs/${blogId}`)
+      .set('Authorization', `Bearer ${permaToken}`)
       .expect(404)
 
     // Assert that status code is 404 after deletion
@@ -153,11 +179,12 @@ describe('Functions changing blog content', () => {
       "author": "Spacing Napoleon",
       "url": "www.orwellwasright.com",
       "likes": 42,
-      "user":"673effae84655ca98d08db36"
+      "user": permaUserId,
     }
 
     const postedBlog = await api
       .post('/api/blogs/')
+      .set('Authorization', `Bearer ${permaToken}`)
       .send(newBlog)
       .expect(200)
       .expect('Content-Type', /application\/json/)
@@ -169,11 +196,12 @@ describe('Functions changing blog content', () => {
       "author": "Spacing Napoleon",
       "url": "www.orwellwasright.com",
       "likes": 52,
-      "user":"673effae84655ca98d08db36"
+      "user": permaUserId,
     }
 
     const changedBlog = await api
       .put(`/api/blogs/${blogId}`)  // Corrected string interpolation with backticks
+      .set('Authorization', `Bearer ${permaToken}`)
       .send(changeBlog)
       .expect(200)
       .expect('Content-Type', /application\/json/)
