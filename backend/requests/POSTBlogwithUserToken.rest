@@ -1,6 +1,6 @@
 POST http://localhost:3003/api/blogs HTTP/1.1
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImpvaG5fZG9lIiwiaWQiOiI2NzRhY2Q3ZTU3NTliNWJiZjNjYWRiNjciLCJpYXQiOjE3MzM1MDQ5MzksImV4cCI6MTczMzUwODUzOX0.7ARuWClyhGSpM-L4GT7halVV_-2BQToErX8UpoKQ1S8
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImpvaG5fZG9lIiwiaWQiOiI2NzRhY2Q3ZTU3NTliNWJiZjNjYWRiNjciLCJpYXQiOjE3MzM5MjA3NTIsImV4cCI6MTczMzkyNDM1Mn0.BxqjDWQFrxcJnZLEr-fs-hRD3sPDymD3PyF5a1ZymIc
 
 {
   "title": "Tokenization of Life, part 4",

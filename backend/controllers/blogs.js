@@ -23,37 +23,41 @@ blogsRouter.get('/:id', async (request, response, next) => {
 })
 
 blogsRouter.post('/', async (request, response) => {
-  
   const body = request.body
- 
-  const decodedToken = jwt.verify(request.token, process.env.SECRET)
-  if (!decodedToken.id) {
-    return response.status(401).json({ error: 'token invalid' })
+
+  const token = request.token
+  if (!token) {
+    return response.status(401).json({ error: 'No token provided' })
+  } try {
+    const decodedToken = jwt.verify(token, process.env.SECRET)
+
+    if (!decodedToken.id) {
+      return response.status(401).json({ error: 'Invalid token provided' })
+    }
+
+    const user = request.user
+
+    if (!body.title || !body.url) {
+      return response.status(400).json({ error: 'Title and URL required' })
+    }
+
+    const blog = new Blog({
+      title: body.title,
+      author: body.author,
+      url: body.url,
+      likes: body.likes || 0,
+      user: user._id,
+    })
+
+    const savedBlog = await blog.save()
+    user.blogs = user.blogs.concat(savedBlog._id)
+    await user.save()
+
+    response.json(savedBlog)
+
+  } catch (error) {
+    return response.status(401).json({ error: 'Invalid token provided' });
   }
-
-  const user = request.user
-
-  if (!decodedToken.id || !body.title || !body.url) {
-    const errorMessage = !decodedToken.id
-      ? 'Token invalid'
-      : 'Title and URL required';
-  
-    return response.status(!decodedToken.id ? 401 : 400).json({ error: errorMessage });
-  }
-  
-  const blog = new Blog({
-    title: body.title,
-    author: body.author,
-    url: body.url,
-    likes: body.likes ?? 0,
-    user: user._id,
-  })
-
-  const savedBlog = await blog.save()
-  request.user.blogs = request.user.blogs.concat(savedBlog._id)
-  await request.user.save()
-
-  response.json(savedBlog)
 })
 
 blogsRouter.delete('/:id', async (request, response, next) => {
