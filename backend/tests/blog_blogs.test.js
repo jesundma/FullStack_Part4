@@ -84,7 +84,7 @@ describe('total likes', () => {
     const result = listHelper.totalLikes(listWithMultipleBlogs)
     assert.strictEqual(result, 36)
   })
-  test('when list no blogs ', () => {
+  test('when list with no blogs ', () => {
     const result = listHelper.totalLikes(listWithNoBlogs)
     assert.strictEqual(result, 0)
   })

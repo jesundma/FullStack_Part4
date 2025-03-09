@@ -53,7 +53,7 @@ blogsRouter.post('/', async (request, response) => {
     user.blogs = user.blogs.concat(savedBlog._id)
     await user.save()
 
-    response.json(savedBlog)
+    response.status(201).json(savedBlog)
 
   } catch (error) {
     return response.status(401).json({ error: 'Invalid token provided' });

@@ -18,6 +18,7 @@ let permaUserId = ''
 
 beforeEach(async () => {
   await User.deleteMany({})
+  await Blog.deleteMany({})
 
   const user = new User({
     username: 'SuperUser',
@@ -37,12 +38,14 @@ beforeEach(async () => {
 
   permaToken = response.body.token
 
-  await Blog.deleteMany({})
-
   const blogsWithUser = helper.initialBlogs.map(blog => ({...blog, user: permaUserId}))
   const blogObjects = blogsWithUser.map(blog => new Blog(blog))
   const promiseArray = blogObjects.map(blog => blog.save())
   await Promise.all(promiseArray)
+
+  const blogCount = await Blog.countDocuments();
+  console.log(`Database initialized with ${blogCount} blogs`)
+
 })
 
 test('notes are returned as json', async () => {
@@ -84,7 +87,7 @@ test('add new blog functions and confirm that original and response values are s
     .post('/api/blogs/')
     .set('Authorization', `Bearer ${permaToken}`)
     .send(newBlog)
-    .expect(200)
+    .expect(201)
     .expect('Content-Type', /application\/json/)
 
   const response = await api.get('/api/blogs')
@@ -115,7 +118,7 @@ describe('tests for field content and default', () => {
       .post('/api/blogs/')
       .set('Authorization', `Bearer ${permaToken}`)
       .send(newBlog)
-      .expect(200)
+      .expect(201)
       .expect('Content-Type', /application\/json/)
 
     assert.strictEqual(postedBlog.body.likes, 0)
@@ -192,7 +195,7 @@ describe('Functions changing blog content', () => {
       .post('/api/blogs/')
       .set('Authorization', `Bearer ${permaToken}`)
       .send(newBlog)
-      .expect(200)
+      .expect(201)
       .expect('Content-Type', /application\/json/)
     
     const blogId = postedBlog.body.id
@@ -225,7 +228,7 @@ describe('Functions changing blog content', () => {
       .post('/api/blogs/')
       .set('Authorization', `Bearer ${permaToken}`)
       .send(newBlog)
-      .expect(200)
+      .expect(201)
       .expect('Content-Type', /application\/json/)
 
     const blogId = postedBlog.body.id
